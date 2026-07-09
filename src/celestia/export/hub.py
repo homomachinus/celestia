@@ -27,7 +27,7 @@ def hf_login(token: str | None = None) -> None:
         if token:
             login(token=token, add_to_git_credential=True)
         else:
-            log.info("No HF_TOKEN in env; prompting for token …")
+            log.info("No HF_TOKEN in env; prompting for token ...")
             token = getpass("HuggingFace Hub token (write access): ")
             login(token=token, add_to_git_credential=True)
     log.info("HuggingFace login successful.")
@@ -66,7 +66,7 @@ def push_to_hub(
         private=private,
         exist_ok=True,
     )
-    log.info("Pushing model from %s to %s …", model_dir, url)
+    log.info("Pushing model from %s to %s ...", model_dir, url)
 
     api.upload_folder(
         folder_path=model_dir,

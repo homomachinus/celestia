@@ -21,9 +21,9 @@ def apply_lora(model: PreTrainedModel, cfg: LoRAConfig) -> PreTrainedModel:
     """Wrap *model* with a LoRA adapter.
 
     Steps:
-      1. ``prepare_model_for_kbit_training`` — casts certain modules
+      1. ``prepare_model_for_kbit_training`` -- casts certain modules
          to fp32 for gradient stability under 4-bit.
-      2. ``get_peft_model`` — injects trainable LoRA matrices into
+      2. ``get_peft_model`` -- injects trainable LoRA matrices into
          the target modules.
 
     Returns the PEFT-wrapped model (same interface as ``PreTrainedModel``).

@@ -1,13 +1,15 @@
-"""CPT trainer — both single-GPU and DDP modes.
+"""CPT trainer -- Continual Pre-Training, single-GPU and DDP.
 
 The primary entry point is :func:`run_cpt`, which:
-  1. Loads + cleans + tokenises + packs the corpus.
+  1. Loads + cleans + tokenises + packs a raw text corpus.
   2. Prints dataset statistics and time estimates.
   3. Launches training (inline or via ``notebook_launcher`` for DDP).
+
+Works with any text corpus -- just point ``CPTConfig.corpus_dir`` at your
+directory of ``.txt`` files.
 """
 
 from __future__ import annotations
-
 import datetime
 import glob
 import json
@@ -40,21 +42,21 @@ log = logging.getLogger(__name__)
 
 
 def _prepare_dataset(cfg: CPTConfig, tokenizer):
-    """Load → clean → build → tokenise → pack.  Returns packed Dataset."""
-    log.info("Step 1 — Loading books …")
+    """Load -> clean -> build -> tokenise -> pack.  Returns packed Dataset."""
+    log.info("Step 1 -- Loading books ...")
     raw_books = load_books(cfg.corpus_dir)
     log.info("  Found %d book(s).\n", len(raw_books))
 
-    log.info("Step 2 — Cleaning text …")
+    log.info("Step 2 -- Cleaning text ...")
     cleaned_books = {
         name: clean_text(text, book_name=name)
         for name, text in raw_books.items()
     }
 
-    log.info("Step 3 — Building dataset …")
+    log.info("Step 3 -- Building dataset ...")
     dataset = build_dataset(cleaned_books)
 
-    log.info("Step 4 — Tokenising & packing …")
+    log.info("Step 4 -- Tokenising & packing ...")
     packed = tokenize_and_pack(dataset, tokenizer, max_seq_len=cfg.max_seq_len)
 
     print_dataset_stats(packed, tokenizer)
@@ -217,7 +219,7 @@ def _train_ddp(cfg: CPTConfig, packed_dataset: Dataset, tokenizer) -> None:
         if is_main:
             _save_adapter(cfg, model, tok)
 
-    log.info("Launching DDP training on %d GPUs…", cfg.num_gpus)
+    log.info("Launching DDP training on %d GPUs...", cfg.num_gpus)
     notebook_launcher(
         train_per_rank,
         args=(),
@@ -242,7 +244,7 @@ def _save_adapter(cfg: CPTConfig, model, tokenizer) -> None:
     meta = {
         "base_model": cfg.model_id,
         "method": "QLoRA (4-bit NF4)" + (" + DDP" if cfg.use_ddp else ""),
-        "hardware": f"{cfg.num_gpus}×GPU" if cfg.use_ddp else "single GPU",
+        "hardware": f"{cfg.num_gpus}xGPU" if cfg.use_ddp else "single GPU",
         "objective": "Causal Language Modeling",
         "corpus_dir": cfg.corpus_dir,
         "num_epochs": cfg.num_epochs,
@@ -268,9 +270,9 @@ def _save_adapter(cfg: CPTConfig, model, tokenizer) -> None:
     print("=" * 55)
 
 
-# ──────────────────────────────────────────────
+# ??????????????????????????????????????????????
 #  Public entry point
-# ──────────────────────────────────────────────
+# ??????????????????????????????????????????????
 
 def run_cpt(cfg: CPTConfig) -> None:
     """Run the full Continual Pre-Training pipeline."""

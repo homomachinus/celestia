@@ -1,8 +1,8 @@
 """Dataset building and tokenisation for CPT.
 
 Core workflow:
-  1. ``build_dataset(books)`` — convert ``{name: text}`` → HuggingFace Dataset
-  2. ``tokenize_and_pack(dataset, tokenizer, max_seq_len)`` — tokenise all text,
+  1. ``build_dataset(books)`` -- convert ``{name: text}`` -> HuggingFace Dataset
+  2. ``tokenize_and_pack(dataset, tokenizer, max_seq_len)`` -- tokenise all text,
      concatenate, and chop into fixed-length sequences (no padding).
 """
 
@@ -70,7 +70,7 @@ def tokenize_and_pack(
     discarded = total_tokens - kept_tokens
 
     log.info("  Total tokens : %s", f"{total_tokens:,}")
-    log.info("  Sequences    : %s × %d", f"{total_seqs:,}", max_seq_len)
+    log.info("  Sequences    : %s x %d", f"{total_seqs:,}", max_seq_len)
     log.info("  Discarded    : %s tail tokens (%.1f%%)",
              f"{discarded:,}", discarded / max(1, total_tokens) * 100)
 
@@ -89,9 +89,9 @@ def tokenize_and_pack(
     return packed
 
 
-# ──────────────────────────────────────────────
+# ??????????????????????????????????????????????
 #  Diagnostic helpers
-# ──────────────────────────────────────────────
+# ??????????????????????????????????????????????
 
 def print_dataset_stats(packed_dataset: Dataset, tokenizer) -> None:
     """Print human-readable statistics about the packed dataset."""
@@ -107,7 +107,7 @@ def print_dataset_stats(packed_dataset: Dataset, tokenizer) -> None:
     if n > 0:
         sample = packed_dataset[0]["input_ids"][:8]
         decoded = tokenizer.decode(sample)
-        print(f"  Sample decode     : {decoded!r}…")
+        print(f"  Sample decode     : {decoded!r}...")
     print("=" * 55)
 
 
@@ -121,8 +121,8 @@ def estimate_training_time(
     """Estimate total training time and print a summary.
 
     *steps_per_second* is an empirical throughput value:
-      - T4 single-GPU + Qwen2.5-3B + LoRA ≈ 0.25 step/s
-      - 2×T4 DDP                                          ≈ 0.50 step/s
+      - T4 single-GPU + Qwen2.5-3B + LoRA ? 0.25 step/s
+      - 2xT4 DDP                                          ? 0.50 step/s
     """
     steps_per_epoch = max(1, math.ceil(num_sequences / (batch_size * grad_accum)))
     total_steps = steps_per_epoch * num_epochs
@@ -136,7 +136,7 @@ def estimate_training_time(
     print("  TRAINING TIME ESTIMATE")
     print("=" * 55)
     print(f"  Sequences / epoch : {num_sequences:,}")
-    print(f"  Effective batch   : {batch_size} × {grad_accum} = {batch_size * grad_accum}")
+    print(f"  Effective batch   : {batch_size} x {grad_accum} = {batch_size * grad_accum}")
     print(f"  Steps / epoch     : {steps_per_epoch:,}")
     print(f"  Total steps       : {total_steps:,}")
     print(f"  Epochs            : {num_epochs}")

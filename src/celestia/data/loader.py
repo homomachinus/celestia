@@ -43,12 +43,12 @@ def load_books(corpus_dir: str) -> dict[str, str]:
             books[name] = text
             log.info("  Loaded %-30s %8s chars", name, f"{len(text):,}")
         except (UnicodeDecodeError, OSError) as exc:
-            log.warning("  Skipped %s — %s", path, exc)
+            log.warning("  Skipped %s -- %s", path, exc)
 
     return books
 
 
-# ── Gutenberg regexes compiled once ──────────
+# ?? Gutenberg regexes compiled once ??????????
 
 _START_PATTERN = re.compile(
     r"\*\*\*\s*START\s+(OF\s+)?(THE\s+)?PROJECT\s+GUTENBERG",
@@ -97,7 +97,7 @@ def clean_text(text: str, book_name: str = "") -> str:
 
         # --- Gutenberg footer / licence -----------------------
         if _START_PATTERN.search(line):
-            continue  # stray start marker in body → skip
+            continue  # stray start marker in body -> skip
         if _END_PATTERN.search(line):
             in_licence = True
             continue
@@ -134,13 +134,13 @@ def clean_text(text: str, book_name: str = "") -> str:
     if book_name:
         orig = len(text.splitlines())
         final = len(result.splitlines())
-        log.info("  Cleaned %s: %d → %d lines (%s chars)",
+        log.info("  Cleaned %s: %d -> %d lines (%s chars)",
                   book_name, orig, final, f"{len(result):,}")
 
     return result
 
 
-# ── GPU diagnostic (moved from utils for convenience) ──
+# ?? GPU diagnostic (moved from utils for convenience) ??
 
 def print_gpu_memory() -> None:
     """Log current GPU VRAM usage."""

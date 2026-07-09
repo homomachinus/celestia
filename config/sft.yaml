@@ -1,11 +1,14 @@
-# SFT configuration for Celestia-Plato
-# =====================================
-# Fine-tune the CPT model on chat-style Q&A data.
+# SFT configuration for Celestia
+# ===============================
+# Fine-tune the CPT model on chat-style Q&A data where the assistant
+# speaks as your target historical figure.
+# Change `model_id`, `dataset_path`, and `default_system_prompt` to
+# retarget at a different figure.
 
 # --- Paths -------------------------------------------------
-model_id: nuxt/celestia-plato_3b   # your CPT-merged model
-output_dir: /content/plato_sft_data
-dataset_path: /content/plato_sft_data.jsonl
+model_id: my/cpt-finished-model   # your CPT model (HF ID or local path)
+output_dir: /output/SFT
+dataset_path: /data/sft_data.jsonl
 
 # --- Training hyperparameters ------------------------------
 max_seq_len: 1024
@@ -41,12 +44,12 @@ quant:
   bnb_4bit_compute_dtype: bfloat16
 
 # --- SFT specific ------------------------------------------
-default_system_prompt: "You are Plato."
+default_system_prompt: "You are Plato."  # change per figure
 eval_split: 0.05
 
 # --- Post-training (optional) ------------------------------
 push_to_hub: false
-hub_repo_id: ""                    # e.g. nuxt/celestia-plato-3b
+hub_repo_id: ""                    # e.g. myuser/my-model
 hub_private: true
 convert_gguf: false
 gguf_quant_type: Q4_K_M

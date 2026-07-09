@@ -53,7 +53,7 @@ def merge_adapter(
     log.info("Loading adapter from %s", adapter_path)
     model = PeftModel.from_pretrained(base, adapter_path)
 
-    log.info("Merging adapter into base weights…")
+    log.info("Merging adapter into base weights...")
     merged = model.merge_and_unload()
 
     os.makedirs(output_dir, exist_ok=True)

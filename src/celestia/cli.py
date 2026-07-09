@@ -1,5 +1,8 @@
 """Celestia-Plato CLI.
 
+Two-stage fine-tuning pipeline that turns any base LLM into any historical
+figure by training on their original writings.
+
 Usage::
 
     celestia cpt --config config/cpt.yaml
@@ -7,7 +10,7 @@ Usage::
     celestia merge --adapter PATH --base MODEL_ID --output DIR
     celestia quantize --model PATH --outdir DIR
     celestia hub --model PATH --repo USER/REPO
-    celestia generate --model PATH --prompt "…"
+    celestia generate --model PATH --prompt "..."
 """
 
 from __future__ import annotations
@@ -32,14 +35,14 @@ from celestia.utils.logging import setup_logging
 log = logging.getLogger(__name__)
 
 
-# ──────────────────────────────────────────────
+# ??????????????????????????????????????????????
 #  Subcommand handlers
-# ──────────────────────────────────────────────
+# ??????????????????????????????????????????????
 
 def _cmd_cpt(args: argparse.Namespace) -> None:
     cfg = load_cpt_config(args.config)
     log.info("CPT config loaded from %s", args.config)
-    log.info("Effective batch size: %d  (%d GPU%s × %d batch × %d accum)",
+    log.info("Effective batch size: %d  (%d GPU%s x %d batch x %d accum)",
              cfg.effective_batch_size,
              cfg.num_gpus if cfg.use_ddp else 1,
              "s" if cfg.num_gpus > 1 else "",
@@ -69,11 +72,11 @@ def _cmd_quantize(args: argparse.Namespace) -> None:
     outdir = args.outdir
     os.makedirs(outdir, exist_ok=True)
 
-    # Step 1: HF → f16 GGUF
+    # Step 1: HF -> f16 GGUF
     f16_path = os.path.join(outdir, f"{os.path.basename(model_dir)}-f16.gguf")
     convert_to_gguf(model_dir, f16_path, outtype="f16")
 
-    # Step 2: f16 → Q4_K_M
+    # Step 2: f16 -> Q4_K_M
     q4_path = f16_path.replace("f16.gguf", f"{args.quant_type}.gguf")
     quantize_gguf(f16_path, q4_path, quant_type=args.quant_type)
 
@@ -131,19 +134,19 @@ def _cmd_generate(args: argparse.Namespace) -> None:
         skip_special_tokens=True,
     )
     print()
-    print("─" * 55)
+    print("-" * 55)
     print(response)
-    print("─" * 55)
+    print("-" * 55)
 
 
-# ──────────────────────────────────────────────
+# ??????????????????????????????????????????????
 #  Argument parser
-# ──────────────────────────────────────────────
+# ??????????????????????????????????????????????
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="celestia",
-        description=f"Celestia-Plato v{__version__} — Turn Qwen into Plato",
+        description=f"Celestia v{__version__} -- Turn any LLM into any historical figure",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
@@ -151,7 +154,7 @@ Examples:
   celestia sft --config config/sft.yaml
   celestia merge --adapter output/sft_adapter --base Qwen/Qwen2.5-3B --output merged
   celestia quantize --model merged --outdir gguf
-  celestia hub --model merged --repo nuxt/celestia-plato-3b
+  celestia hub --model merged --repo myuser/my-model
   celestia generate --model merged --prompt "What is justice?" --system "You are Plato"
 """,
     )
@@ -164,25 +167,25 @@ Examples:
 
     sub = parser.add_subparsers(dest="command", required=True)
 
-    # ── cpt ──
+    # -- cpt --
     p_cpt = sub.add_parser("cpt", help="Run Continual Pre-Training")
     p_cpt.add_argument("--config", required=True, help="Path to CPT YAML config")
     p_cpt.set_defaults(func=_cmd_cpt)
 
-    # ── sft ──
+    # -- sft --
     p_sft = sub.add_parser("sft", help="Run Supervised Fine-Tuning")
     p_sft.add_argument("--config", required=True, help="Path to SFT YAML config")
     p_sft.set_defaults(func=_cmd_sft)
 
-    # ── merge ──
+    # -- merge --
     p_merge = sub.add_parser("merge", help="Merge LoRA adapter into base model")
     p_merge.add_argument("--adapter", required=True, help="Path to saved adapter dir")
     p_merge.add_argument("--base", required=True, help="Base model ID")
     p_merge.add_argument("--output", required=True, help="Output directory")
     p_merge.set_defaults(func=_cmd_merge)
 
-    # ── quantize ──
-    p_q = sub.add_parser("quantize", help="Convert HF model → GGUF + quantize")
+    # -- quantize --
+    p_q = sub.add_parser("quantize", help="Convert HF model to GGUF + quantize")
     p_q.add_argument("--model", required=True, help="Merged HF model directory")
     p_q.add_argument("--outdir", required=True, help="Output directory for .gguf files")
     p_q.add_argument("--quant-type", default="Q4_K_M",
@@ -190,7 +193,7 @@ Examples:
                      help="Quantization format (default: Q4_K_M)")
     p_q.set_defaults(func=_cmd_quantize)
 
-    # ── hub ──
+    # -- hub --
     p_hub = sub.add_parser("hub", help="Push model to HuggingFace Hub")
     p_hub.add_argument("--model", required=True, help="Local model directory")
     p_hub.add_argument("--repo", required=True, help="HF repo ID (e.g. user/model)")
@@ -198,7 +201,7 @@ Examples:
     p_hub.add_argument("--public", action="store_true", help="Make repo public")
     p_hub.set_defaults(func=_cmd_hub)
 
-    # ── generate ──
+    # -- generate --
     p_gen = sub.add_parser("generate", help="Quick inference sanity check")
     p_gen.add_argument("--model", required=True, help="Model ID or local path")
     p_gen.add_argument("--prompt", default="hello", help="User prompt")
@@ -211,9 +214,9 @@ Examples:
     return parser
 
 
-# ──────────────────────────────────────────────
+# ??????????????????????????????????????????????
 #  Entry point
-# ──────────────────────────────────────────────
+# ??????????????????????????????????????????????
 
 def main(argv: list[str] | None = None) -> None:
     parser = _build_parser()
@@ -222,14 +225,14 @@ def main(argv: list[str] | None = None) -> None:
     log_level = logging.DEBUG if args.verbose else logging.INFO
     setup_logging(level=log_level)
 
-    log.info("Celestia-Plato v%s", __version__)
+    log.info("Celestia v%s", __version__)
 
     if torch.cuda.is_available():
         log.info("CUDA available: %d device(s)", torch.cuda.device_count())
         for i in range(torch.cuda.device_count()):
             log.info("  GPU %d: %s", i, torch.cuda.get_device_name(i))
     else:
-        log.warning("CUDA not available — training will be slow or impossible")
+        log.warning("CUDA not available -- training will be slow or impossible")
 
     args.func(args)
 

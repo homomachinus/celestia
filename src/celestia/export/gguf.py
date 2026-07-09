@@ -22,7 +22,7 @@ def _ensure_llama_cpp():
     """Clone llama.cpp if not already present."""
     if os.path.isdir(LLAMA_CPP_DIR):
         return
-    log.info("Cloning llama.cpp …")
+    log.info("Cloning llama.cpp ...")
     subprocess.check_call([
         sys.executable, "-m", "pip", "install", "-q", "-r",
         os.path.join(LLAMA_CPP_DIR, "requirements.txt"),
@@ -55,7 +55,7 @@ def convert_to_gguf(
     _ensure_llama_cpp()
     script = os.path.join(LLAMA_CPP_DIR, "convert_hf_to_gguf.py")
 
-    log.info("Converting %s → %s (type=%s)", model_dir, output_path, outtype)
+    log.info("Converting %s -> %s (type=%s)", model_dir, output_path, outtype)
     subprocess.check_call([
         sys.executable, script,
         model_dir,
@@ -74,8 +74,8 @@ def quantize_gguf(
     """Quantize an f16 GGUF file to a smaller type (e.g. Q4_K_M).
 
     Two strategies are tried in order:
-      1. ``llama-quantize`` (from compiled llama.cpp) — faster.
-      2. ``llama_cpp.llama_model_quantize`` (Python binding) — fallback.
+      1. ``llama-quantize`` (from compiled llama.cpp) -- faster.
+      2. ``llama_cpp.llama_model_quantize`` (Python binding) -- fallback.
 
     Parameters
     ----------
@@ -84,7 +84,7 @@ def quantize_gguf(
     output_path:
         Where to write the quantized GGUF.
     quant_type:
-        Quantization format (``"Q4_K_M"``, ``"Q5_K_M"``, …).
+        Quantization format (``"Q4_K_M"``, ``"Q5_K_M"``, ...).
 
     Returns
     -------
@@ -93,13 +93,13 @@ def quantize_gguf(
     # Strategy 1: compiled llama-quantize
     quantize_bin = os.path.join(LLAMA_CPP_DIR, "build", "bin", "llama-quantize")
     if os.path.isfile(quantize_bin):
-        log.info("Quantizing via llama-quantize: %s → %s", input_path, output_path)
+        log.info("Quantizing via llama-quantize: %s -> %s", input_path, output_path)
         subprocess.check_call([quantize_bin, input_path, output_path, quant_type])
         log.info("Quantization complete: %s", output_path)
         return output_path
 
     # Strategy 2: Python binding fallback
-    log.info("llama-quantize not found; trying llama-cpp-python binding …")
+    log.info("llama-quantize not found; trying llama-cpp-python binding ...")
     try:
         from llama_cpp import (  # type: ignore[import-untyped]
             LLAMA_FTYPE_MOSTLY_Q4_K_M,
