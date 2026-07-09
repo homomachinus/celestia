@@ -1,0 +1,55 @@
+# SFT configuration for Celestia-Plato
+# =====================================
+# Fine-tune the CPT model on chat-style Q&A data.
+
+# --- Paths -------------------------------------------------
+model_id: nuxt/celestia-plato_3b   # your CPT-merged model
+output_dir: /content/plato_sft_data
+dataset_path: /content/plato_sft_data.jsonl
+
+# --- Training hyperparameters ------------------------------
+max_seq_len: 1024
+batch_size: 2
+grad_accum: 8                      # effective batch = 16
+learning_rate: 1e-4
+warmup_ratio: 0.05
+num_epochs: 3
+weight_decay: 0.01
+logging_steps: 10
+save_steps: 50
+max_grad_norm: 1.0
+
+# --- LoRA --------------------------------------------------
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+# --- 4-bit quantisation ------------------------------------
+quant:
+  load_in_4bit: true
+  bnb_4bit_quant_type: nf4
+  bnb_4bit_use_double_quant: true
+  bnb_4bit_compute_dtype: bfloat16
+
+# --- SFT specific ------------------------------------------
+default_system_prompt: "You are Plato."
+eval_split: 0.05
+
+# --- Post-training (optional) ------------------------------
+push_to_hub: false
+hub_repo_id: ""                    # e.g. nuxt/celestia-plato-3b
+hub_private: true
+convert_gguf: false
+gguf_quant_type: Q4_K_M
+
+# --- Misc --------------------------------------------------
+seed: 42

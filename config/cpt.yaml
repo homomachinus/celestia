@@ -1,0 +1,51 @@
+# CPT configuration for Celestia-Plato
+# =====================================
+# Change `corpus_dir` to retarget the pipeline at a different philosopher.
+
+# --- Paths -------------------------------------------------
+model_id: Qwen/Qwen2.5-3B       # base model — NOT instruct!
+corpus_dir: /kaggle/working/celestia-v1-3b
+output_dir: /kaggle/working/Plato-CPT
+
+# --- Multi-GPU ---------------------------------------------
+use_ddp: true                    # Distributed Data Parallel
+num_gpus: 2                      # Kaggle 2×T4
+
+# --- Training hyperparameters ------------------------------
+max_seq_len: 2048                # context window
+batch_size: 2                    # per-device batch
+# grad_accum is auto-derived for effective batch = 16:
+#   DDP:     2 GPUs × 2 batch × 4 accum = 16  → use 4
+#   Single:  1 GPU  × 2 batch × 8 accum = 16  → use 8
+grad_accum: 4
+learning_rate: 2e-4
+warmup_ratio: 0.05
+num_epochs: 3
+weight_decay: 0.01
+logging_steps: 10
+save_steps: 200
+max_grad_norm: 1.0
+
+# --- LoRA --------------------------------------------------
+lora:
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+# --- 4-bit quantisation ------------------------------------
+quant:
+  load_in_4bit: true
+  bnb_4bit_quant_type: nf4
+  bnb_4bit_use_double_quant: true
+  bnb_4bit_compute_dtype: bfloat16
+
+# --- Misc --------------------------------------------------
+seed: 42

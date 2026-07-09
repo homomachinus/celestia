@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "celestia-plato"
+version = "1.0.0"
+description = "Continual pre-training and supervised fine-tuning of Qwen2.5-3B on Plato's corpus"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+dependencies = [
+    "torch>=2.1",
+    "transformers>=4.53",
+    "peft>=0.17",
+    "accelerate>=1.10",
+    "bitsandbytes>=0.47",
+    "datasets>=3.0",
+    "tensorboard>=2.16",
+    "pyyaml>=6.0",
+    "pydantic>=2.5",
+    "huggingface_hub>=0.34",
+    "tqdm>=4.66",
+]
+# Optional extras for GGUF export / post-training
+[project.optional-dependencies]
+gguf = [
+    "llama-cpp-python>=0.2",
+]
+torchao = [
+    "torchao>=0.16",
+]
+
+[project.scripts]
+celestia = "celestia.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
